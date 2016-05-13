@@ -34,23 +34,22 @@ namespace MiniVVM
             }
         }
 
-        public ContentPage ResolveView<TViewModel>(Dictionary<string, object> data = null) where TViewModel : ViewModel
+        public Page ResolveView<TViewModel>(Dictionary<string, object> data = null) where TViewModel : ViewModel
         {
             var views = ViewRegister.GetViewsByViewModel<TViewModel>();
 
-            ExportedView exportedView = views.Any(v => v.TargetIdom == Device.Idiom) 
-                ? views.Single(v => v.TargetIdom == Device.Idiom) 
+            var exportedView = views.Any(v => v.TargetIdom == Device.Idiom)
+                ? views.Single(v => v.TargetIdom == Device.Idiom)
                 : views.Single(v => v.TargetIdom == TargetIdiom.Phone);
 
-
-            ContentPage view = Activator.CreateInstance(exportedView.ViewType) as ContentPage;
-            ViewModel viewModel = Activator.CreateInstance(exportedView.ViewModelType) as ViewModel;             
+            var view = (Page)Activator.CreateInstance(exportedView.ViewType);
+            var viewModel = (ViewModel)Activator.CreateInstance(exportedView.ViewModelType);
 
             view.BindingContext = viewModel;
             viewModel.Navigation = view.Navigation;
             view.BindingContext = viewModel;
 
-            if(data != null)
+            if (data != null)
                 PopulateViewModel(viewModel, data);
 
             viewModel.Init(data);
